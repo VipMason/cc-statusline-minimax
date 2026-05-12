@@ -1,5 +1,13 @@
 # Claude Code Statusline for MiniMax
 
+[English](./README.md) | [中文](./README_zh.md)
+
+---
+
+<!-- English -->
+
+# Claude Code Statusline for MiniMax
+
 A customized Claude Code statusline that displays MiniMax API quota usage, TPS metrics, and more.
 
 ## Preview
