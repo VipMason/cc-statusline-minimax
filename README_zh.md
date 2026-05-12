@@ -38,45 +38,55 @@
 
 ## 安装步骤
 
-### 一键配置
+### 一键配置（推荐）
 
 ```bash
-curl -s https://raw.githubusercontent.com/VipMason/cc-statusline-minimax/master/statusline-command.sh -o ~/.claude/statusline-command.sh && chmod +x ~/.claude/statusline-command.sh && cat ~/.claude/settings.json | jq '.statusLine={"type":"command","command":"~/.claude/statusline-command.sh"}' > /tmp/settings.json && mv /tmp/settings.json ~/.claude/settings.json && echo "配置完成，重启Claude Code生效"
+curl -sL https://raw.githubusercontent.com/VipMason/cc-statusline-minimax/master/install.sh | bash
 ```
+
+自动检测并安装缺失的依赖（jq、mmx、python）。
 
 ### 手动配置
 
-#### 1. 克隆或复制脚本
+#### 1. 安装依赖
 
+**mmx:**
 ```bash
-git clone https://github.com/VipMason/cc-statusline-minimax.git
+npm install -g @minimax-ai/mmx
+mmx auth login --api-key YOUR_API_KEY
 ```
 
-#### 2. 配置 Claude Code 设置
+**jq:**
+```bash
+# Windows (winget)
+winget install jqlang.jq
+# macOS
+brew install jq
+# Linux
+sudo apt install jq
+```
 
-在 Claude Code 的 `settings.json` 中添加：
+**python:** 从 https://www.python.org/downloads/ 下载
+
+#### 2. 下载脚本
+
+```bash
+curl -sL https://raw.githubusercontent.com/VipMason/cc-statusline-minimax/master/statusline-command.sh -o ~/.claude/statusline-command.sh
+chmod +x ~/.claude/statusline-command.sh
+```
+
+#### 3. 配置 Claude Code
+
+在 `settings.json` 中添加：
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "C:/Users/YOUR_USERNAME/.claude/statusline-command.sh"
+    "command": "~/.claude/statusline-command.sh"
   }
 }
 ```
-
-### 3. 自动检测（无需手动配置）
-
-脚本会自动从 PATH 中检测 `jq`、`mmx` 和 `python`。如果找不到工具，会显示错误信息并提供安装指引。
-
-如果自动检测失败，可在 `statusline-command.sh` 顶部设置自定义路径：
-```bash
-JQ="/自定义/路径/jq.exe"
-MMX="/自定义/路径/mmx"
-PYTHON="/自定义/路径/python"
-```
-
-#### 3. 安装依赖
 
 **mmx:**
 ```bash

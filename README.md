@@ -40,42 +40,54 @@ A customized Claude Code statusline that displays MiniMax API quota usage, TPS m
 
 ## Installation
 
-### One-Click Setup
+### One-Click Setup (Recommended)
 
 ```bash
-curl -s https://raw.githubusercontent.com/VipMason/cc-statusline-minimax/master/statusline-command.sh -o ~/.claude/statusline-command.sh && chmod +x ~/.claude/statusline-command.sh && cat ~/.claude/settings.json | jq '.statusLine={"type":"command","command":"~/.claude/statusline-command.sh"}' > /tmp/settings.json && mv /tmp/settings.json ~/.claude/settings.json && echo "Done - restart Claude Code"
+curl -sL https://raw.githubusercontent.com/VipMason/cc-statusline-minimax/master/install.sh | bash
 ```
+
+This will auto-detect and install missing dependencies (jq, mmx, python).
 
 ### Manual Setup
 
-#### 1. Clone or copy the script
+#### 1. Install dependencies
 
+**mmx:**
 ```bash
-git clone https://github.com/VipMason/cc-statusline-minimax.git
+npm install -g @minimax-ai/mmx
+mmx auth login --api-key YOUR_API_KEY
 ```
 
-#### 2. Configure Claude Code settings
+**jq:**
+```bash
+# Windows (winget)
+winget install jqlang.jq
+# macOS
+brew install jq
+# Linux
+sudo apt install jq
+```
 
-Add to your Claude Code `settings.json`:
+**python:** Download from https://www.python.org/downloads/
+
+#### 2. Download script
+
+```bash
+curl -sL https://raw.githubusercontent.com/VipMason/cc-statusline-minimax/master/statusline-command.sh -o ~/.claude/statusline-command.sh
+chmod +x ~/.claude/statusline-command.sh
+```
+
+#### 3. Configure Claude Code
+
+Add to your `settings.json`:
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "C:/Users/YOUR_USERNAME/.claude/statusline-command.sh"
+    "command": "~/.claude/statusline-command.sh"
   }
 }
-```
-
-### 3. Auto-detection (no manual config needed)
-
-The script automatically detects `jq`, `mmx`, and `python` from your PATH. If a tool is not found, it shows an error message with installation instructions.
-
-If auto-detection fails, you can set custom paths at the top of `statusline-command.sh`:
-```bash
-JQ="/custom/path/to/jq.exe"
-MMX="/custom/path/to/mmx"
-PYTHON="/custom/path/to/python"
 ```
 
 #### 3. Install dependencies
