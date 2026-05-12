@@ -1,6 +1,7 @@
 #!/bin/bash
 # Claude Code Statusline for MiniMax
 # Auto-detects required tools: jq, mmx, python
+# Dynamically displays all available quotas from mmx
 
 # ANSI colors
 CYAN='\033[0;36m'
@@ -13,20 +14,16 @@ RESET='\033[0m'
 detect_tool() {
     local tool=$1
     local fallback=$2
-    # Try to find in PATH first
-    local path_found
     path_found=$(which "$tool" 2>/dev/null)
     if [ -n "$path_found" ] && [ -f "$path_found" ]; then
         echo "$path_found"
         return 0
     fi
-    # Try .exe extension on Windows
     path_found=$(which "${tool}.exe" 2>/dev/null)
     if [ -n "$path_found" ] && [ -f "$path_found" ]; then
         echo "$path_found"
         return 0
     fi
-    # Fallback to provided path
     if [ -n "$fallback" ] && [ -f "$fallback" ]; then
         echo "$fallback"
         return 0
@@ -38,7 +35,6 @@ JQ=$(detect_tool "jq" "")
 MMX=$(detect_tool "mmx" "")
 PYTHON=$(detect_tool "python3" "python")
 
-# Check required tools
 if [ -z "$JQ" ] || [ ! -f "$JQ" ]; then
     echo -e "${RED}Error: jq not found. Install jq or add to PATH${RESET}" >&2
     exit 1
@@ -61,56 +57,6 @@ elif echo "$MODEL" | grep -qi "low"; then
     EFFORT="low"
 else
     EFFORT="mid"
-fi
-
-# Get MiniMax quota usage
-QUOTA_JSON=$("$MMX" quota show --output json 2>/dev/null)
-
-# Get MiniMax-M* quota (main model)
-if [ -n "$QUOTA_JSON" ]; then
-    USAGE_5H=$(echo "$QUOTA_JSON" | "$JQ" -r '.model_remains[] | select(.model_name | startswith("MiniMax-M")) | .current_interval_usage_count')
-    TOTAL_5H=$(echo "$QUOTA_JSON" | "$JQ" -r '.model_remains[] | select(.model_name | startswith("MiniMax-M")) | .current_interval_total_count')
-    REMAINS_5H=$(echo "$QUOTA_JSON" | "$JQ" -r '.model_remains[] | select(.model_name | startswith("MiniMax-M")) | .remains_time')
-    USAGE_7D=$(echo "$QUOTA_JSON" | "$JQ" -r '.model_remains[] | select(.model_name | startswith("MiniMax-M")) | .current_weekly_usage_count')
-    TOTAL_7D=$(echo "$QUOTA_JSON" | "$JQ" -r '.model_remains[] | select(.model_name | startswith("MiniMax-M")) | .current_weekly_total_count')
-    REMAINS_7D=$(echo "$QUOTA_JSON" | "$JQ" -r '.model_remains[] | select(.model_name | startswith("MiniMax-M")) | .weekly_remains_time')
-
-    if [ -n "$USAGE_5H" ] && [ -n "$TOTAL_5H" ] && [ "$TOTAL_5H" -gt 0 ]; then
-        PCT_5H=$((USAGE_5H * 100 / TOTAL_5H))
-    else
-        PCT_5H=0
-    fi
-
-    if [ -n "$USAGE_7D" ] && [ -n "$TOTAL_7D" ] && [ "$TOTAL_7D" -gt 0 ]; then
-        PCT_7D=$((USAGE_7D * 100 / TOTAL_7D))
-    else
-        PCT_7D=0
-    fi
-
-    format_time() {
-        local ms=$1
-        local s=$((ms / 1000))
-        local m=$((s / 60))
-        local h=$((m / 60))
-        local d=$((h / 24))
-        if [ $d -gt 0 ]; then
-            echo "${d}d$((h % 24))h"
-        else
-            echo "$((m / 60))h$((m % 60))m"
-        fi
-    }
-
-    TIME_5H=$(format_time $REMAINS_5H)
-    TIME_7D=$(format_time $REMAINS_7D)
-
-    # Get coding-plan quotas only
-    QUOTAS=$(echo "$QUOTA_JSON" | "$JQ" -r '.model_remains[] | select(.model_name | startswith("coding-plan")) | "\(.model_name) \(.current_interval_usage_count)/\(.current_interval_total_count)"' 2>/dev/null)
-else
-    PCT_5H=0
-    PCT_7D=0
-    TIME_5H="--"
-    TIME_7D="--"
-    QUOTAS=""
 fi
 
 # Get TPS - cache 60s
@@ -136,15 +82,18 @@ else
     TPS=$(cat "$CACHE_FILE" 2>/dev/null || echo "0")
 fi
 
+# Get MiniMax quota usage
+QUOTA_JSON=$("$MMX" quota show --output json 2>/dev/null)
+
 # Build progress bar
 build_bar() {
     local pct=$1
-    local width=10
+    local width=8
+    [ $pct -gt 100 ] && pct=100
     local filled=$((pct * width / 100))
     [ $filled -gt $width ] && filled=$width
     local empty=$((width - filled))
     local bar=""
-    local i
     for ((i=0; i<filled; i++)); do bar="${bar}█"; done
     for ((i=0; i<empty; i++)); do bar="${bar}░"; done
     echo "$bar"
@@ -162,27 +111,68 @@ get_color() {
     fi
 }
 
-BAR_5H=$(build_bar $PCT_5H)
-BAR_7D=$(build_bar $PCT_7D)
-COLOR_5H=$(get_color $PCT_5H)
-COLOR_7D=$(get_color $PCT_7D)
-
-# Format quotas nicely
-format_quotas() {
-    local qs="$1"
-    local result=""
-    while IFS= read -r line; do
-        [ -z "$line" ] && continue
-        name=$(echo "$line" | cut -d' ' -f1)
-        usage=$(echo "$line" | cut -d' ' -f2)
-        # Shorten names
-        name=$(echo "$name" | sed 's/coding-plan-//g' | sed 's/vlm/v/g' | sed 's/search/s/g')
-        result="${result}${YELLOW}${name}${RESET}:${CYAN}${usage}${RESET} "
-    done <<< "$qs"
-    echo "$result"
+# Format time remaining
+format_time() {
+    local ms=$1
+    local s=$((ms / 1000))
+    local m=$((s / 60))
+    local h=$((m / 60))
+    local d=$((h / 24))
+    if [ $d -gt 0 ]; then
+        echo "${d}d$((h % 24))h"
+    else
+        echo "$((m / 60))h$((m % 60))m"
+    fi
 }
 
-QUOTAS_FORMATTED=$(format_quotas "$QUOTAS")
+# Shorten model name for display
+shorten_name() {
+    echo "$1" | sed \
+        -e 's/^MiniMax-M[0-9]*\.[0-9]*-/M/g' \
+        -e 's/-highspeed$//g' \
+        -e 's/-low$//g' \
+        -e 's/coding-plan-/cp-/g' \
+        -e 's/vlm/v/g' \
+        -e 's/search/s/g' \
+        -e 's/text/t/g' \
+        -e 's/image/i/g' \
+        -e 's/video/vd/g' \
+        -e 's/audio/a/g'
+}
 
-# Output: [Model] | effort | ctx | tps | 5h bar | 7d bar | quotas
-echo -e "${CYAN}[${MODEL}]${RESET} | ${GREEN}[${EFFORT}]${RESET} | ${YELLOW}ctx:${CTX_USAGE}%${RESET} | ${CYAN}tps:${TPS}${RESET} | ${COLOR_5H}${BAR_5H}${RESET} ${PCT_5H}% ${TIME_5H} /5h | ${COLOR_7D}${BAR_7D}${RESET} ${PCT_7D}% ${TIME_7D} /7d | ${QUOTAS_FORMATTED}"
+# Build dynamic quota display
+QUOTA_OUTPUT=""
+if [ -n "$QUOTA_JSON" ]; then
+    # Get all model names
+    MODEL_NAMES=$(echo "$QUOTA_JSON" | "$JQ" -r '.model_remains[].model_name' 2>/dev/null)
+
+    while IFS= read -r name; do
+        [ -z "$name" ] && continue
+
+        # Skip if already processed (avoid duplicates)
+        echo "$QUOTA_OUTPUT" | grep -qF "$name" && continue
+
+        # Get quota data
+        usage=$(echo "$QUOTA_JSON" | "$JQ" -r ".model_remains[] | select(.model_name == \"$name\") | .current_interval_usage_count")
+        total=$(echo "$QUOTA_JSON" | "$JQ" -r ".model_remains[] | select(.model_name == \"$name\") | .current_interval_total_count")
+        remains=$(echo "$QUOTA_JSON" | "$JQ" -r ".model_remains[] | select(.model_name == \"$name\") | .remains_time")
+
+        # Calculate percentage
+        if [ -n "$usage" ] && [ -n "$total" ] && [ "$total" -gt 0 ] 2>/dev/null; then
+            pct=$((usage * 100 / total))
+        else
+            pct=0
+        fi
+
+        # Build display
+        short=$(shorten_name "$name")
+        bar=$(build_bar $pct)
+        color=$(get_color $pct)
+        time_str=$(format_time ${remains:-0})
+
+        QUOTA_OUTPUT="${QUOTA_OUTPUT}${color}${short}:${bar}${RESET} ${pct}% ${time_str} "
+    done <<< "$MODEL_NAMES"
+fi
+
+# Output: [Model] | effort | ctx | tps | quotas
+echo -e "${CYAN}[${MODEL}]${RESET} | ${GREEN}[${EFFORT}]${RESET} | ${YELLOW}ctx:${CTX_USAGE}%${RESET} | ${CYAN}tps:${TPS}${RESET} | ${QUOTA_OUTPUT}"
