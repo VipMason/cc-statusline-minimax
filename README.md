@@ -59,14 +59,15 @@ Add to your Claude Code `settings.json`:
 }
 ```
 
-### 3. Update paths in the script
+### 3. Auto-detection (no manual config needed)
 
-Edit `statusline-command.sh` and update these paths for your system:
+The script automatically detects `jq`, `mmx`, and `python` from your PATH. If a tool is not found, it shows an error message with installation instructions.
 
+If auto-detection fails, you can set custom paths at the top of `statusline-command.sh`:
 ```bash
-JQ="/c/Users/YOUR_USERNAME/AppData/Roaming/TRAE SOLO CN/ModularData/ai-agent/vm/tools/app/jq/jq.exe"
-MMX="/c/Users/YOUR_USERNAME/AppData/Roaming/npm/mmx"
-PYTHON="/c/software/miniconda/python"
+JQ="/custom/path/to/jq.exe"
+MMX="/custom/path/to/mmx"
+PYTHON="/custom/path/to/python"
 ```
 
 ### 4. Install dependencies

@@ -1,9 +1,6 @@
 #!/bin/bash
-# jq and mmx paths for Windows Git Bash
-# TODO: Update these paths for your system
-JQ="/PATH/TO/jq.exe"
-MMX="/PATH/TO/mmx"
-PYTHON="/PATH/TO/python"
+# Claude Code Statusline for MiniMax
+# Auto-detects required tools: jq, mmx, python
 
 # ANSI colors
 CYAN='\033[0;36m'
@@ -11,6 +8,46 @@ YELLOW='\033[0;33m'
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 RESET='\033[0m'
+
+# Auto-detect tools
+detect_tool() {
+    local tool=$1
+    local fallback=$2
+    # Try to find in PATH first
+    local path_found
+    path_found=$(which "$tool" 2>/dev/null)
+    if [ -n "$path_found" ] && [ -f "$path_found" ]; then
+        echo "$path_found"
+        return 0
+    fi
+    # Try .exe extension on Windows
+    path_found=$(which "${tool}.exe" 2>/dev/null)
+    if [ -n "$path_found" ] && [ -f "$path_found" ]; then
+        echo "$path_found"
+        return 0
+    fi
+    # Fallback to provided path
+    if [ -n "$fallback" ] && [ -f "$fallback" ]; then
+        echo "$fallback"
+        return 0
+    fi
+    return 1
+}
+
+JQ=$(detect_tool "jq" "")
+MMX=$(detect_tool "mmx" "")
+PYTHON=$(detect_tool "python3" "python")
+
+# Check required tools
+if [ -z "$JQ" ] || [ ! -f "$JQ" ]; then
+    echo -e "${RED}Error: jq not found. Install jq or add to PATH${RESET}" >&2
+    exit 1
+fi
+
+if [ -z "$MMX" ] || [ ! -f "$MMX" ]; then
+    echo -e "${RED}Error: mmx not found. Install mmx CLI first.${RESET}" >&2
+    exit 1
+fi
 
 input=$(cat)
 

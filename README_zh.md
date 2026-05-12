@@ -57,14 +57,15 @@ git clone https://github.com/YOUR_USERNAME/cc-statusline-minimax.git
 }
 ```
 
-### 3. 更新脚本中的路径
+### 3. 自动检测（无需手动配置）
 
-编辑 `statusline-command.sh`，根据你的系统更新以下路径：
+脚本会自动从 PATH 中检测 `jq`、`mmx` 和 `python`。如果找不到工具，会显示错误信息并提供安装指引。
 
+如果自动检测失败，可在 `statusline-command.sh` 顶部设置自定义路径：
 ```bash
-JQ="/c/Users/YOUR_USERNAME/AppData/Roaming/TRAE SOLO CN/ModularData/ai-agent/vm/tools/app/jq/jq.exe"
-MMX="/c/Users/YOUR_USERNAME/AppData/Roaming/npm/mmx"
-PYTHON="/c/software/miniconda/python"
+JQ="/自定义/路径/jq.exe"
+MMX="/自定义/路径/mmx"
+PYTHON="/自定义/路径/python"
 ```
 
 ### 4. 安装依赖

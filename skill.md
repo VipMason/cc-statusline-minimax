@@ -29,10 +29,12 @@ Set in Claude Code `settings.json`:
 {
   "statusLine": {
     "type": "command",
-    "command": "PATH/TO/statusline-command.sh"
+    "command": "C:/Users/YOUR_USERNAME/.claude/statusline-command.sh"
   }
 }
 ```
+
+**Auto-detection**: The script automatically finds `jq`, `mmx`, and `python` from PATH. No manual configuration needed if tools are installed.
 
 ## Output Format
 
