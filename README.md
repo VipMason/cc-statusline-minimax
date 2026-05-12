@@ -40,13 +40,21 @@ A customized Claude Code statusline that displays MiniMax API quota usage, TPS m
 
 ## Installation
 
-### 1. Clone or copy the script
+### One-Click Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/cc-statusline-minimax.git
+curl -s https://raw.githubusercontent.com/VipMason/cc-statusline-minimax/master/statusline-command.sh -o ~/.claude/statusline-command.sh && chmod +x ~/.claude/statusline-command.sh && cat ~/.claude/settings.json | jq '.statusLine={"type":"command","command":"~/.claude/statusline-command.sh"}' > /tmp/settings.json && mv /tmp/settings.json ~/.claude/settings.json && echo "Done - restart Claude Code"
 ```
 
-### 2. Configure Claude Code settings
+### Manual Setup
+
+#### 1. Clone or copy the script
+
+```bash
+git clone https://github.com/VipMason/cc-statusline-minimax.git
+```
+
+#### 2. Configure Claude Code settings
 
 Add to your Claude Code `settings.json`:
 
@@ -70,7 +78,7 @@ MMX="/custom/path/to/mmx"
 PYTHON="/custom/path/to/python"
 ```
 
-### 4. Install dependencies
+#### 3. Install dependencies
 
 **mmx:**
 ```bash
@@ -81,7 +89,7 @@ mmx auth login --api-key YOUR_API_KEY
 **jq:**
 Download from https://jqlang.github.io/jq/ and add to PATH
 
-### 5. (Optional) Install Nerd Font
+#### 4. (Optional) Install Nerd Font
 
 For proper Unicode block character rendering, install a Nerd Font like [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases).
 

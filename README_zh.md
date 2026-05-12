@@ -38,13 +38,21 @@
 
 ## 安装步骤
 
-### 1. 克隆或复制脚本
+### 一键配置
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/cc-statusline-minimax.git
+curl -s https://raw.githubusercontent.com/VipMason/cc-statusline-minimax/master/statusline-command.sh -o ~/.claude/statusline-command.sh && chmod +x ~/.claude/statusline-command.sh && cat ~/.claude/settings.json | jq '.statusLine={"type":"command","command":"~/.claude/statusline-command.sh"}' > /tmp/settings.json && mv /tmp/settings.json ~/.claude/settings.json && echo "配置完成，重启Claude Code生效"
 ```
 
-### 2. 配置 Claude Code 设置
+### 手动配置
+
+#### 1. 克隆或复制脚本
+
+```bash
+git clone https://github.com/VipMason/cc-statusline-minimax.git
+```
+
+#### 2. 配置 Claude Code 设置
 
 在 Claude Code 的 `settings.json` 中添加：
 
@@ -68,7 +76,7 @@ MMX="/自定义/路径/mmx"
 PYTHON="/自定义/路径/python"
 ```
 
-### 4. 安装依赖
+#### 3. 安装依赖
 
 **mmx:**
 ```bash
@@ -79,7 +87,7 @@ mmx auth login --api-key YOUR_API_KEY
 **jq:**
 从 https://jqlang.github.io/jq/ 下载并添加到 PATH
 
-### 5. (可选) 安装 Nerd Font
+#### 4. (可选) 安装 Nerd Font
 
 为正确显示 Unicode 块字符，请安装 [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases) 或其他 Nerd Font。
 
