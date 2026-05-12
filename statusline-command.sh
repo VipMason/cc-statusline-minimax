@@ -36,7 +36,7 @@ detect_tool() {
 
 JQ=$(detect_tool "jq" "")
 MMX=$(detect_tool "mmx" "")
-PYTHON=$(detect_tool "python3" "python")
+PYTHON=$(detect_tool "python" "")
 
 # Check required tools
 if [ -z "$JQ" ] || [ ! -f "$JQ" ]; then
