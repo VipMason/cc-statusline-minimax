@@ -24,9 +24,7 @@ A customized Claude Code statusline that displays MiniMax API quota usage, TPS m
 - **Effort level** - Parsed from model name (high/mid/low)
 - **Context usage** - Shows context window utilization percentage
 - **TPS (Tokens Per Second)** - Measures API throughput, cached for 60s
-- **5h quota bar** - Daily usage with progress bar and time remaining
-- **7d quota bar** - Weekly usage with progress bar and time remaining
-- **Coding plan quotas** - VLM and Search usage counts
+- **Dynamic quotas** - Automatically displays ALL quotas from your plan with progress bars
 - **Dynamic colors** - Progress bars change color based on usage level:
   - Green: < 50%
   - Yellow: 50-79%
