@@ -10,6 +10,8 @@
 
 ## 效果预览
 
+![状态栏演示](statusline-demo.png)
+
 ```
 [MiniMax-M2.7-highspeed] | [high] | ctx:45% | tps:128.5 | ████████░░ 78% 1h14m /5h | █████░░░░░ 52% 1d18h /7d | v:45/150 s:12/100
 ```
