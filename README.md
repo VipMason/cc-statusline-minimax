@@ -4,10 +4,6 @@
 
 ---
 
-<!-- English -->
-
-# Claude Code Statusline for MiniMax
-
 A customized Claude Code statusline that displays MiniMax API quota usage, TPS metrics, and more.
 
 ## Preview
@@ -36,7 +32,7 @@ A customized Claude Code statusline that displays MiniMax API quota usage, TPS m
 - [jq](https://jqlang.github.io/jq/) - JSON processor
 - Python with `mmx` accessible in PATH or via full path
 - Git Bash / MINGW64 environment (Windows)
-- Nerd Font for Unicode block characters (e.g., FiraCode Nerd Font)
+- **Nerd Font** — ⚠️ Required for Unicode block characters (`▓░`) to render correctly. Without it you'll see blank boxes.
 
 ## Installation
 
@@ -90,22 +86,9 @@ Add to your `settings.json`:
 }
 ```
 
-#### 3. Install dependencies
-
-**mmx:**
-```bash
-npm install -g @minimax-ai/mmx
-mmx auth login --api-key YOUR_API_KEY
-```
-
-**jq:**
-Download from https://jqlang.github.io/jq/ and add to PATH
-
 #### 4. (Optional) Install Nerd Font
 
-For proper Unicode block character rendering, install a Nerd Font like [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases).
-
-Configure Windows Terminal to use FiraCode Nerd Font in `settings.json`.
+For proper Unicode block character rendering, install [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases) (or any Nerd Font). Then configure your terminal to use it.
 
 ## Configuration
 
@@ -132,11 +115,12 @@ The script shows MiniMax-M* main model quotas (5h and 7d) plus coding-plan quota
 
 ## Troubleshooting
 
-### Garbled Unicode characters
+### Garbled Unicode characters (blank boxes)
 
-Ensure:
-1. Windows Terminal uses a Nerd Font (FiraCode, etc.)
-2. Git Bash locale is set to UTF-8 (`export LC_ALL=en_US.UTF-8`)
+⚠️ Make sure your terminal uses a Nerd Font:
+1. Install [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases)
+2. Set it as your terminal's monospace font
+3. On Windows, also set Git Bash locale: `export LC_ALL=en_US.UTF-8`
 
 ### mmx not found
 

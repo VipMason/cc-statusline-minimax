@@ -4,8 +4,6 @@
 
 ---
 
-# Claude Code MiniMax 状态栏
-
 一款定制的 Claude Code 状态栏，显示 MiniMax API 配额使用情况、TPS 指标等。
 
 ## 效果预览
@@ -34,7 +32,7 @@
 - [jq](https://jqlang.github.io/jq/) - JSON 处理器
 - Python（需能从 PATH 或完整路径访问 mmx）
 - Git Bash / MINGW64 环境 (Windows)
-- Nerd Font 字体以显示 Unicode 块字符（如 FiraCode Nerd Font）
+- **Nerd Font** — ⚠️ 必须安装！用于正确显示进度条字符（`▓░`）。未安装会显示方块乱码。
 
 ## 安装步骤
 
@@ -88,20 +86,9 @@ chmod +x ~/.claude/statusline-command.sh
 }
 ```
 
-**mmx:**
-```bash
-npm install -g @minimax-ai/mmx
-mmx auth login --api-key YOUR_API_KEY
-```
-
-**jq:**
-从 https://jqlang.github.io/jq/ 下载并添加到 PATH
-
 #### 4. (可选) 安装 Nerd Font
 
-为正确显示 Unicode 块字符，请安装 [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases) 或其他 Nerd Font。
-
-在 Windows Terminal 的 `settings.json` 中配置使用 FiraCode Nerd Font。
+为正确显示 Unicode 块字符，请安装 [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases) 或其他 Nerd Font，并在终端设置中将其设为等宽字体。
 
 ## 配置说明
 
@@ -128,11 +115,12 @@ mmx auth login --api-key YOUR_API_KEY
 
 ## 故障排查
 
-### Unicode 字符乱码
+### Unicode 字符乱码（方块）
 
-请确保：
-1. Windows Terminal 使用 Nerd Font（如 FiraCode）
-2. Git Bash locale 设置为 UTF-8（`export LC_ALL=en_US.UTF-8`）
+⚠️ 确保终端使用了 Nerd Font：
+1. 安装 [FiraCode Nerd Font](https://github.com/ryanoasis/nerd-fonts/releases)
+2. 在终端设置中将其设为等宽字体
+3. Windows 上还需设置 Git Bash 区域：`export LC_ALL=en_US.UTF-8`
 
 ### mmx 找不到
 
